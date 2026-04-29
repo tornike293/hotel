@@ -13,10 +13,8 @@ class ApartmentServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new ApartmentServiceImpl(new InMemoryApartmentRepository());
+        service = new ApartmentServiceImpl(new MockApartmentRepository());
     }
-
-    // --- register ---
 
     @Test
     void register_success() {
@@ -44,8 +42,6 @@ class ApartmentServiceImplTest {
         assertEquals(0.0, a.getPrice());
     }
 
-    // --- reserve ---
-
     @Test
     void reserve_success() {
         service.register(1, 100.0);
@@ -65,8 +61,6 @@ class ApartmentServiceImplTest {
     void reserve_notFound_throws() {
         assertThrows(IllegalArgumentException.class, () -> service.reserve(99, "Alice"));
     }
-
-    // --- release ---
 
     @Test
     void release_success() {
@@ -88,15 +82,12 @@ class ApartmentServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> service.release(99));
     }
 
-    // --- list ---
-
     @Test
     void list_returnsAllWhenSizeLarge() {
         service.register(1, 100.0);
         service.register(2, 200.0);
         service.register(3, 50.0);
-        List<Apartment> result = service.list(10, "id");
-        assertEquals(3, result.size());
+        assertEquals(3, service.list(10, "id").size());
     }
 
     @Test
@@ -104,8 +95,7 @@ class ApartmentServiceImplTest {
         service.register(1, 100.0);
         service.register(2, 200.0);
         service.register(3, 50.0);
-        List<Apartment> result = service.list(2, "id");
-        assertEquals(2, result.size());
+        assertEquals(2, service.list(2, "id").size());
     }
 
     @Test
@@ -136,7 +126,6 @@ class ApartmentServiceImplTest {
         service.register(2, 200.0);
         service.reserve(2, "Alice");
         List<Apartment> result = service.list(10, "status");
-        // FREE comes before RESERVED alphabetically
         assertFalse(result.get(0).getReservationStatus());
         assertTrue(result.get(1).getReservationStatus());
     }
@@ -149,7 +138,6 @@ class ApartmentServiceImplTest {
         service.reserve(1, "Charlie");
         service.reserve(2, "Alice");
         List<Apartment> result = service.list(10, "client");
-        // no client ("-") sorts first, then Alice, then Charlie
         assertNull(result.get(0).getClientName());
         assertEquals("Alice", result.get(1).getClientName());
         assertEquals("Charlie", result.get(2).getClientName());
@@ -157,7 +145,6 @@ class ApartmentServiceImplTest {
 
     @Test
     void list_emptyRepository() {
-        List<Apartment> result = service.list(10, "id");
-        assertTrue(result.isEmpty());
+        assertTrue(service.list(10, "id").isEmpty());
     }
 }

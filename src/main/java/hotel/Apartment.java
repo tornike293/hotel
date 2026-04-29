@@ -13,21 +13,10 @@ public class Apartment {
         clientName = null;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public String getClientName() {
-        return clientName;
-    }
-
-    public boolean getReservationStatus() {
-        return reservationStatus;
-    }
+    public int getId() { return id; }
+    public double getPrice() { return price; }
+    public String getClientName() { return clientName; }
+    public boolean getReservationStatus() { return reservationStatus; }
 
     public void reserve(String clientName) {
         this.clientName = clientName;

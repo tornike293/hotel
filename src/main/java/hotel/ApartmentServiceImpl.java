@@ -53,15 +53,11 @@ public class ApartmentServiceImpl implements ApartmentService {
 
     private Comparator<Apartment> comparatorFor(String sortBy) {
         switch (sortBy) {
-            case "price":
-                return Comparator.comparingDouble(Apartment::getPrice);
-            case "status":
-                return Comparator.comparing(a -> Boolean.toString(a.getReservationStatus()));
-            case "client":
-                return Comparator.comparing(
-                        a -> a.getClientName() != null ? a.getClientName() : "");
-            default:
-                return Comparator.comparingInt(Apartment::getId);
+            case "price":  return Comparator.comparingDouble(Apartment::getPrice);
+            case "status": return Comparator.comparing(a -> Boolean.toString(a.getReservationStatus()));
+            case "client": return Comparator.comparing(
+                    a -> a.getClientName() != null ? a.getClientName() : "");
+            default:       return Comparator.comparingInt(Apartment::getId);
         }
     }
 }
