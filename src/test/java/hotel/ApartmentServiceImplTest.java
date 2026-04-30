@@ -13,7 +13,8 @@ class ApartmentServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new ApartmentServiceImpl(new MockApartmentRepository());
+        // Use mock repository — service logic is tested in isolation
+        service = new ApartmentServiceImpl(new MockApartmentRepository(), true);
     }
 
     @Test
@@ -146,5 +147,19 @@ class ApartmentServiceImplTest {
     @Test
     void list_emptyRepository() {
         assertTrue(service.list(10, "id").isEmpty());
+    }
+
+    @Test
+    void reserve_whenDisabled_throws() {
+        ApartmentService disabledService = new ApartmentServiceImpl(new MockApartmentRepository(), false);
+        disabledService.register(1, 100.0);
+        assertThrows(IllegalStateException.class, () -> disabledService.reserve(1, "Alice"));
+    }
+
+    @Test
+    void release_whenDisabled_throws() {
+        ApartmentService disabledService = new ApartmentServiceImpl(new MockApartmentRepository(), false);
+        disabledService.register(1, 100.0);
+        assertThrows(IllegalStateException.class, () -> disabledService.release(1));
     }
 }

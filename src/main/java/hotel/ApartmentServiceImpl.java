@@ -2,12 +2,15 @@ package hotel;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ApartmentServiceImpl implements ApartmentService {
     private final ApartmentRepository repository;
+    private final boolean statusChangeEnabled;
 
-    public ApartmentServiceImpl(ApartmentRepository repository) {
+    public ApartmentServiceImpl(ApartmentRepository repository, boolean statusChangeEnabled) {
         this.repository = repository;
+        this.statusChangeEnabled = statusChangeEnabled;
     }
 
     @Override
@@ -23,6 +26,8 @@ public class ApartmentServiceImpl implements ApartmentService {
 
     @Override
     public Apartment reserve(int id, String clientName) {
+        if (!statusChangeEnabled)
+            throw new IllegalStateException("Reservation changes are disabled by configuration.");
         Apartment apartment = findOrThrow(id);
         if (apartment.getReservationStatus())
             throw new IllegalStateException("Apartment " + id + " is already reserved.");
@@ -32,6 +37,8 @@ public class ApartmentServiceImpl implements ApartmentService {
 
     @Override
     public Apartment release(int id) {
+        if (!statusChangeEnabled)
+            throw new IllegalStateException("Reservation changes are disabled by configuration.");
         Apartment apartment = findOrThrow(id);
         if (!apartment.getReservationStatus())
             throw new IllegalStateException("Apartment " + id + " is not reserved.");
@@ -41,9 +48,10 @@ public class ApartmentServiceImpl implements ApartmentService {
 
     @Override
     public List<Apartment> list(int size, String sortBy) {
-        List<Apartment> all = repository.findAll();
-        all.sort(comparatorFor(sortBy));
-        return all.subList(0, Math.min(size, all.size()));
+        return repository.findAll().stream()
+                .sorted(comparatorFor(sortBy))
+                .limit(size)
+                .collect(Collectors.toList());
     }
 
     private Apartment findOrThrow(int id) {

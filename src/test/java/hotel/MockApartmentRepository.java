@@ -2,7 +2,11 @@ package hotel;
 
 import java.util.*;
 
-
+/**
+ * A simple hand-written mock — no Mockito needed.
+ * Lets us control exactly what the repository returns
+ * so service logic is tested in complete isolation.
+ */
 public class MockApartmentRepository implements ApartmentRepository {
     private final Map<Integer, Apartment> store = new LinkedHashMap<>();
 
