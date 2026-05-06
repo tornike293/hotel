@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@WebServlet("/apartments")
+
 public class ApartmentsServlet extends HttpServlet {
     private final Gson gson = new Gson();
 

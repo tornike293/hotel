@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Map;
 
 
-@WebServlet("/apartments/*")
+
 public class ReservationServlet extends HttpServlet {
     private final Gson gson = new Gson();
 
