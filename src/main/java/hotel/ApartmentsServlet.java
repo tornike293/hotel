@@ -8,16 +8,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-
-
+@WebServlet("/apartments")
 public class ApartmentsServlet extends HttpServlet {
     private final Gson gson = new Gson();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        int size = parseIntOrDefault(req.getParameter("size"), 10);
+        int size = parseIntOrDefault(req.getParameter("size"), Integer.MAX_VALUE);
         String sortBy = req.getParameter("sortBy") != null ? req.getParameter("sortBy") : "id";
-
         List<Apartment> apartments = ServiceLocator.getService().list(size, sortBy);
         sendJson(resp, 200, apartments);
     }
@@ -29,10 +27,8 @@ public class ApartmentsServlet extends HttpServlet {
             sendJson(resp, 400, Map.of("error", "id and price are required"));
             return;
         }
-
         int id = ((Number) body.get("id")).intValue();
         double price = ((Number) body.get("price")).doubleValue();
-
         try {
             Apartment a = ServiceLocator.getService().register(id, price);
             sendJson(resp, 201, a);

@@ -1,20 +1,14 @@
 package hotel;
 
-
 public class ServiceLocator {
     private static ApartmentService service;
-    private static JsonStateStorage storage;
+    private static DatabaseConfig databaseConfig;
 
-    public static void init(ApartmentService apartmentService, JsonStateStorage stateStorage) {
+    public static void init(ApartmentService apartmentService, DatabaseConfig dbConfig) {
         service = apartmentService;
-        storage = stateStorage;
+        databaseConfig = dbConfig;
     }
 
-    public static ApartmentService getService() {
-        return service;
-    }
-
-    public static JsonStateStorage getStorage() {
-        return storage;
-    }
+    public static ApartmentService getService() { return service; }
+    public static DatabaseConfig getDatabaseConfig() { return databaseConfig; }
 }

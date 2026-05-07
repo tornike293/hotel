@@ -8,4 +8,5 @@ public interface ApartmentRepository {
     Optional<Apartment> findById(int id);
     List<Apartment> findAll();
     boolean existsById(int id);
+    void update(Apartment apartment);
 }

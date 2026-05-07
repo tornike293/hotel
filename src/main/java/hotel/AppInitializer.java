@@ -4,35 +4,38 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
-import java.util.List;
-
 @WebListener
 public class AppInitializer implements ServletContextListener {
-
     private static final String CONFIG_FILE = "config.properties";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        AppConfig config = new AppConfig(CONFIG_FILE);
-        JsonStateStorage storage = new JsonStateStorage(config.getStateFilePath());
+        DatabaseConfig dbConfig = new DatabaseConfig(CONFIG_FILE);
+        ApartmentRepository repository = new DatabaseApartmentRepository(dbConfig.getDataSource());
 
-        ApartmentRepository repository = new InMemoryApartmentRepository();
-        List<Apartment> saved = storage.load();
-        saved.forEach(repository::save);
+        boolean statusChangeEnabled = loadStatusChangeEnabled();
+        ApartmentService service = new ApartmentServiceImpl(repository, statusChangeEnabled);
+        ServiceLocator.init(service, dbConfig);
 
-        ApartmentService service = new ApartmentServiceImpl(repository, config.isStatusChangeEnabled());
-        ServiceLocator.init(service, storage);
-
-        System.out.println("Hotel app started. State loaded from " + config.getStateFilePath());
+        System.out.println("Hotel app started. Connected to database.");
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        ApartmentService service = ServiceLocator.getService();
-        JsonStateStorage storage = ServiceLocator.getStorage();
-        if (service != null && storage != null) {
-            storage.save(service.list(Integer.MAX_VALUE, "id"));
-            System.out.println("State saved.");
+        DatabaseConfig dbConfig = ServiceLocator.getDatabaseConfig();
+        if (dbConfig != null) {
+            dbConfig.close();
+            System.out.println("Database connection pool closed.");
+        }
+    }
+
+    private boolean loadStatusChangeEnabled() {
+        try (java.io.InputStream in = new java.io.FileInputStream(CONFIG_FILE)) {
+            java.util.Properties props = new java.util.Properties();
+            props.load(in);
+            return Boolean.parseBoolean(props.getProperty("hotel.status.change.enabled", "true"));
+        } catch (Exception e) {
+            return true;
         }
     }
 }

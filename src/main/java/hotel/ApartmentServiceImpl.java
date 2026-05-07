@@ -27,22 +27,24 @@ public class ApartmentServiceImpl implements ApartmentService {
     @Override
     public Apartment reserve(int id, String clientName) {
         if (!statusChangeEnabled)
-            throw new IllegalStateException("Reservation changes are disabled by configuration.");
+            throw new IllegalStateException("Reservation changes are disabled.");
         Apartment apartment = findOrThrow(id);
         if (apartment.getReservationStatus())
             throw new IllegalStateException("Apartment " + id + " is already reserved.");
         apartment.reserve(clientName);
+        repository.update(apartment);
         return apartment;
     }
 
     @Override
     public Apartment release(int id) {
         if (!statusChangeEnabled)
-            throw new IllegalStateException("Reservation changes are disabled by configuration.");
+            throw new IllegalStateException("Reservation changes are disabled.");
         Apartment apartment = findOrThrow(id);
         if (!apartment.getReservationStatus())
             throw new IllegalStateException("Apartment " + id + " is not reserved.");
         apartment.release();
+        repository.update(apartment);
         return apartment;
     }
 

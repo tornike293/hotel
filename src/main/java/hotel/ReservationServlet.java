@@ -7,8 +7,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Map;
 
-
-
+@WebServlet("/apartments/*")
 public class ReservationServlet extends HttpServlet {
     private final Gson gson = new Gson();
 
@@ -22,7 +21,6 @@ public class ReservationServlet extends HttpServlet {
             sendJson(resp, 400, Map.of("error", "clientName is required"));
             return;
         }
-
         try {
             Apartment a = ServiceLocator.getService().reserve(id, (String) body.get("clientName"));
             sendJson(resp, 200, a);
@@ -51,11 +49,8 @@ public class ReservationServlet extends HttpServlet {
     private int extractId(HttpServletRequest req) {
         try {
             String pathInfo = req.getPathInfo();
-            String[] parts = pathInfo.split("/");
-            return Integer.parseInt(parts[1]);
-        } catch (Exception e) {
-            return -1;
-        }
+            return Integer.parseInt(pathInfo.split("/")[1]);
+        } catch (Exception e) { return -1; }
     }
 
     private void sendJson(HttpServletResponse resp, int status, Object body) throws IOException {
