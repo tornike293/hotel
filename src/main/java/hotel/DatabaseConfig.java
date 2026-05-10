@@ -10,10 +10,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class DatabaseConfig {
-    private static final String DEFAULT_URL = "jdbc:h2:./hotel-db;AUTO_SERVER=TRUE";
-    private static final String DEFAULT_USER = "sa";
-    private static final String DEFAULT_PASSWORD = "";
-
     private final HikariDataSource dataSource;
 
     public DatabaseConfig(String configFilePath) {
@@ -21,22 +17,28 @@ public class DatabaseConfig {
         try (InputStream in = new FileInputStream(configFilePath)) {
             props.load(in);
         } catch (IOException e) {
-            System.out.println("Config file not found, using defaults.");
+            throw new RuntimeException("Config file not found: " + configFilePath, e);
+        }
+
+        String url = props.getProperty("db.url");
+        String user = props.getProperty("db.user");
+        String password = props.getProperty("db.password");
+
+        if (url == null || user == null || password == null) {
+            throw new RuntimeException("Missing required db.url, db.user or db.password in config.");
         }
 
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(props.getProperty("db.url", DEFAULT_URL));
-        config.setUsername(props.getProperty("db.user", DEFAULT_USER));
-        config.setPassword(props.getProperty("db.password", DEFAULT_PASSWORD));
+        config.setJdbcUrl(url);
+        config.setUsername(user);
+        config.setPassword(password);
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
 
         this.dataSource = new HikariDataSource(config);
     }
 
-    public DataSource getDataSource() {
-        return dataSource;
-    }
+    public DataSource getDataSource() { return dataSource; }
 
     public void close() {
         if (dataSource != null && !dataSource.isClosed()) {

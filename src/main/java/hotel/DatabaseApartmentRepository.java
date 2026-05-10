@@ -1,6 +1,7 @@
 package hotel;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class DatabaseApartmentRepository implements ApartmentRepository {
         String sql = """
                 CREATE TABLE IF NOT EXISTS apartments (
                     id INTEGER PRIMARY KEY,
-                    price DOUBLE NOT NULL,
+                    price DECIMAL(15,2) NOT NULL,
                     reserved BOOLEAN NOT NULL DEFAULT FALSE,
                     client_name VARCHAR(255)
                 )
@@ -37,7 +38,7 @@ public class DatabaseApartmentRepository implements ApartmentRepository {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, apartment.getId());
-            stmt.setDouble(2, apartment.getPrice());
+            stmt.setBigDecimal(2, apartment.getPrice());
             stmt.setBoolean(3, apartment.getReservationStatus());
             stmt.setString(4, apartment.getClientName());
             stmt.executeUpdate();
@@ -102,7 +103,7 @@ public class DatabaseApartmentRepository implements ApartmentRepository {
     }
 
     private Apartment mapRow(ResultSet rs) throws SQLException {
-        Apartment a = new Apartment(rs.getInt("id"), rs.getDouble("price"));
+        Apartment a = new Apartment(rs.getInt("id"), rs.getBigDecimal("price"));
         if (rs.getBoolean("reserved")) {
             a.reserve(rs.getString("client_name"));
         }

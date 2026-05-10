@@ -3,6 +3,7 @@ package hotel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +21,7 @@ class ApartmentServiceImplTest {
     void register_success() {
         Apartment a = service.register(1, 100.0);
         assertEquals(1, a.getId());
-        assertEquals(100.0, a.getPrice());
+        assertEquals(0, a.getPrice().compareTo(BigDecimal.valueOf(100.0)));
         assertFalse(a.getReservationStatus());
     }
 
@@ -37,7 +38,7 @@ class ApartmentServiceImplTest {
 
     @Test
     void register_zeroPriceAllowed() {
-        assertEquals(0.0, service.register(1, 0.0).getPrice());
+        assertEquals(0, service.register(1, 0.0).getPrice().compareTo(BigDecimal.ZERO));
     }
 
     @Test
@@ -86,8 +87,8 @@ class ApartmentServiceImplTest {
         service.register(2, 50.0);
         service.register(3, 200.0);
         List<Apartment> result = service.list(10, "price");
-        assertEquals(50.0, result.get(0).getPrice());
-        assertEquals(200.0, result.get(2).getPrice());
+        assertEquals(0, result.get(0).getPrice().compareTo(BigDecimal.valueOf(50.0)));
+        assertEquals(0, result.get(2).getPrice().compareTo(BigDecimal.valueOf(200.0)));
     }
 
     @Test

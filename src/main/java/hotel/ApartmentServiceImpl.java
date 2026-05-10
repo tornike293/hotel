@@ -1,5 +1,6 @@
 package hotel;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,11 +16,12 @@ public class ApartmentServiceImpl implements ApartmentService {
 
     @Override
     public Apartment register(int id, double price) {
-        if (price < 0)
+        BigDecimal bdPrice = BigDecimal.valueOf(price);
+        if (bdPrice.compareTo(BigDecimal.ZERO) < 0)
             throw new IllegalArgumentException("Price must be non-negative.");
         if (repository.existsById(id))
             throw new IllegalArgumentException("Apartment " + id + " already exists.");
-        Apartment apartment = new Apartment(id, price);
+        Apartment apartment = new Apartment(id, bdPrice);
         repository.save(apartment);
         return apartment;
     }
@@ -63,7 +65,7 @@ public class ApartmentServiceImpl implements ApartmentService {
 
     private Comparator<Apartment> comparatorFor(String sortBy) {
         switch (sortBy) {
-            case "price":  return Comparator.comparingDouble(Apartment::getPrice);
+            case "price":  return Comparator.comparing(Apartment::getPrice);
             case "status": return Comparator.comparing(a -> Boolean.toString(a.getReservationStatus()));
             case "client": return Comparator.comparing(
                     a -> a.getClientName() != null ? a.getClientName() : "");
