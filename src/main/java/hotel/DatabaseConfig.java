@@ -1,16 +1,15 @@
 package hotel;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.cfg.Configuration;
 
-import javax.sql.DataSource;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 public class DatabaseConfig {
-    private final HikariDataSource dataSource;
+    private final EntityManagerFactory entityManagerFactory;
 
     public DatabaseConfig(String configFilePath) {
         Properties props = new Properties();
@@ -20,29 +19,26 @@ public class DatabaseConfig {
             throw new RuntimeException("Config file not found: " + configFilePath, e);
         }
 
-        String url = props.getProperty("db.url");
-        String user = props.getProperty("db.user");
-        String password = props.getProperty("db.password");
+        Configuration configuration = new Configuration();
+        configuration.addAnnotatedClass(Apartment.class);
 
-        if (url == null || user == null || password == null) {
-            throw new RuntimeException("Missing required db.url, db.user or db.password in config.");
-        }
+        configuration.setProperty("hibernate.connection.url", props.getProperty("db.url"));
+        configuration.setProperty("hibernate.connection.username", props.getProperty("db.user"));
+        configuration.setProperty("hibernate.connection.password", props.getProperty("db.password"));
+        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        configuration.setProperty("hibernate.hbm2ddl.auto", "update");
+        configuration.setProperty("hibernate.show_sql", "false");
 
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(url);
-        config.setUsername(user);
-        config.setPassword(password);
-        config.setMaximumPoolSize(10);
-        config.setMinimumIdle(2);
-
-        this.dataSource = new HikariDataSource(config);
+        this.entityManagerFactory = configuration.buildSessionFactory();
     }
 
-    public DataSource getDataSource() { return dataSource; }
+    public EntityManagerFactory getEntityManagerFactory() {
+        return entityManagerFactory;
+    }
 
     public void close() {
-        if (dataSource != null && !dataSource.isClosed()) {
-            dataSource.close();
+        if (entityManagerFactory != null && entityManagerFactory.isOpen()) {
+            entityManagerFactory.close();
         }
     }
 }

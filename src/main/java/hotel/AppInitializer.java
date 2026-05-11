@@ -11,13 +11,13 @@ public class AppInitializer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         DatabaseConfig dbConfig = new DatabaseConfig(CONFIG_FILE);
-        ApartmentRepository repository = new DatabaseApartmentRepository(dbConfig.getDataSource());
+        ApartmentRepository repository = new JpaApartmentRepository(dbConfig.getEntityManagerFactory());
 
         boolean statusChangeEnabled = loadStatusChangeEnabled();
         ApartmentService service = new ApartmentServiceImpl(repository, statusChangeEnabled);
         ServiceLocator.init(service, dbConfig);
 
-        System.out.println("Hotel app started. Connected to database.");
+        System.out.println("Hotel app started. Connected to database via JPA/Hibernate.");
     }
 
     @Override
@@ -25,7 +25,7 @@ public class AppInitializer implements ServletContextListener {
         DatabaseConfig dbConfig = ServiceLocator.getDatabaseConfig();
         if (dbConfig != null) {
             dbConfig.close();
-            System.out.println("Database connection pool closed.");
+            System.out.println("EntityManagerFactory closed.");
         }
     }
 

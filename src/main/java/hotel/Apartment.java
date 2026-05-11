@@ -1,12 +1,26 @@
 package hotel;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+@Entity
+@Table(name = "apartments")
 public class Apartment {
-    private final int id;
-    private final BigDecimal price;
+
+    @Id
+    @Column(name = "id")
+    private int id;
+
+    @Column(name = "price", precision = 15, scale = 2, nullable = false)
+    private BigDecimal price;
+
+    @Column(name = "client_name")
     private String clientName;
+
+    @Column(name = "reserved", nullable = false)
     private boolean reservationStatus;
+
+    protected Apartment() {}
 
     public Apartment(int id, BigDecimal price) {
         this.id = id;
@@ -28,12 +42,5 @@ public class Apartment {
     public void release() {
         this.clientName = null;
         this.reservationStatus = false;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("id=%-3d price=%-8s status=%-10s client=%s",
-                id, price, reservationStatus ? "RESERVED" : "FREE",
-                clientName != null ? clientName : "-");
     }
 }
