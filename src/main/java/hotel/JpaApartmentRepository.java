@@ -15,61 +15,44 @@ public class JpaApartmentRepository implements ApartmentRepository {
 
     @Override
     public void save(Apartment apartment) {
-        EntityManager em = emf.createEntityManager();
-        try {
+        try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
             em.persist(apartment);
             em.getTransaction().commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
             throw new RuntimeException("Failed to save apartment", e);
-        } finally {
-            em.close();
         }
     }
 
     @Override
     public void update(Apartment apartment) {
-        EntityManager em = emf.createEntityManager();
-        try {
+        try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
             em.merge(apartment);
             em.getTransaction().commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
             throw new RuntimeException("Failed to update apartment", e);
-        } finally {
-            em.close();
         }
     }
 
     @Override
     public Optional<Apartment> findById(int id) {
-        EntityManager em = emf.createEntityManager();
-        try {
+        try (EntityManager em = emf.createEntityManager()) {
             return Optional.ofNullable(em.find(Apartment.class, id));
-        } finally {
-            em.close();
         }
     }
 
     @Override
     public List<Apartment> findAll() {
-        EntityManager em = emf.createEntityManager();
-        try {
+        try (EntityManager em = emf.createEntityManager()) {
             return em.createQuery("FROM Apartment", Apartment.class).getResultList();
-        } finally {
-            em.close();
         }
     }
 
     @Override
     public boolean existsById(int id) {
-        EntityManager em = emf.createEntityManager();
-        try {
+        try (EntityManager em = emf.createEntityManager()) {
             return em.find(Apartment.class, id) != null;
-        } finally {
-            em.close();
         }
     }
 }
