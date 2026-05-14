@@ -1,15 +1,22 @@
 package hotel;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class ApartmentServiceImpl implements ApartmentService {
+
     private final ApartmentRepository repository;
     private final boolean statusChangeEnabled;
 
-    public ApartmentServiceImpl(ApartmentRepository repository, boolean statusChangeEnabled) {
+    public ApartmentServiceImpl(
+            ApartmentRepository repository,
+            @Value("${hotel.status.change.enabled:true}") boolean statusChangeEnabled) {
         this.repository = repository;
         this.statusChangeEnabled = statusChangeEnabled;
     }
@@ -21,9 +28,7 @@ public class ApartmentServiceImpl implements ApartmentService {
             throw new IllegalArgumentException("Price must be non-negative.");
         if (repository.existsById(id))
             throw new IllegalArgumentException("Apartment " + id + " already exists.");
-        Apartment apartment = new Apartment(id, bdPrice);
-        repository.save(apartment);
-        return apartment;
+        return repository.save(new Apartment(id, bdPrice));
     }
 
     @Override
@@ -34,8 +39,7 @@ public class ApartmentServiceImpl implements ApartmentService {
         if (apartment.getReservationStatus())
             throw new IllegalStateException("Apartment " + id + " is already reserved.");
         apartment.reserve(clientName);
-        repository.update(apartment);
-        return apartment;
+        return repository.save(apartment);
     }
 
     @Override
@@ -46,8 +50,7 @@ public class ApartmentServiceImpl implements ApartmentService {
         if (!apartment.getReservationStatus())
             throw new IllegalStateException("Apartment " + id + " is not reserved.");
         apartment.release();
-        repository.update(apartment);
-        return apartment;
+        return repository.save(apartment);
     }
 
     @Override

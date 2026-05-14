@@ -1,12 +1,6 @@
 package hotel;
 
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ApartmentRepository {
-    void save(Apartment apartment);
-    Optional<Apartment> findById(int id);
-    List<Apartment> findAll();
-    boolean existsById(int id);
-    void update(Apartment apartment);
+public interface ApartmentRepository extends JpaRepository<Apartment, Integer> {
 }
