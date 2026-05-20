@@ -16,24 +16,12 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<?> reserve(@PathVariable int id, @RequestBody Map<String, String> body) {
-        try {
-            return ResponseEntity.ok(service.reserve(id, body.get("clientName")));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(409).body(Map.of("error", e.getMessage()));
-        }
+    public Apartment reserve(@PathVariable int id, @RequestBody Map<String, String> body) {
+        return service.reserve(id, body.get("clientName"));
     }
 
     @DeleteMapping
-    public ResponseEntity<?> release(@PathVariable int id) {
-        try {
-            return ResponseEntity.ok(service.release(id));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(409).body(Map.of("error", e.getMessage()));
-        }
+    public Apartment release(@PathVariable int id) {
+        return service.release(id);
     }
 }

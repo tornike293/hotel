@@ -25,13 +25,9 @@ public class ApartmentsController {
     }
 
     @PostMapping
-    public ResponseEntity<?> register(@RequestBody Map<String, Object> body) {
-        try {
-            int id = ((Number) body.get("id")).intValue();
-            double price = ((Number) body.get("price")).doubleValue();
-            return ResponseEntity.status(HttpStatus.CREATED).body(service.register(id, price));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<Apartment> register(@RequestBody Map<String, Object> body) {
+        int id = ((Number) body.get("id")).intValue();
+        double price = ((Number) body.get("price")).doubleValue();
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.register(id, price));
     }
 }
